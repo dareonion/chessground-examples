@@ -16,7 +16,7 @@ export const conflictingAnim: Unit = {
       }
     });
     setTimeout(() => {
-      cg.move('f6', 'e5');
+      cg.move('f6', 'e5', null);
       cg.set({
         turnColor: 'white',
         movable: {
@@ -68,9 +68,9 @@ export const notSameRole: Unit = {
       turnColor: 'white',
     });
     setTimeout(() => {
-      cg.move('e4', 'f5');
+      cg.move('e4', 'f5', null);
       setTimeout(() => {
-        cg.move('e6', 'f5');
+        cg.move('e6', 'f5', null);
       }, 500);
     }, 200);
     return cg;

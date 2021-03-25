@@ -1,7 +1,7 @@
 import { Api } from 'chessground/api';
-import { Color, Key } from 'chessground/types';
+import * as cg from 'chessground/types';
 
-export function toDests(chess: any): Map<Key, Key[]> {
+export function toDests(chess: any): Map<cg.Key, cg.Key[]> {
   const dests = new Map();
   chess.SQUARES.forEach(s => {
     const ms = chess.moves({square: s, verbose: true});
@@ -10,14 +10,18 @@ export function toDests(chess: any): Map<Key, Key[]> {
   return dests;
 }
 
-export function toColor(chess: any): Color {
+export function toColor(chess: any): cg.Color {
   return (chess.turn() === 'w') ? 'white' : 'black';
 
 }
 
 export function playOtherSide(cg: Api, chess) {
-  return (orig, dest) => {
-    chess.move({from: orig, to: dest});
+  return (orig, dest, _metadata, promotedTo) => {
+    if (promotedTo === null) {
+      chess.move({from: orig, to: dest});
+    } else {
+      chess.move({from: orig, to: dest, promotion: promotedTo[0]});
+    }
     cg.set({
       turnColor: toColor(chess),
       movable: {
@@ -29,8 +33,12 @@ export function playOtherSide(cg: Api, chess) {
 }
 
 export function aiPlay(cg: Api, chess, delay: number, firstMove: boolean) {
-  return (orig, dest) => {
-    chess.move({from: orig, to: dest});
+  return (orig: cg.Key, dest: cg.Key, _metadata: cg.MoveMetadata, promotedTo: cg.Role | null) => {
+    if (promotedTo === null) {
+      chess.move({from: orig, to: dest});
+    } else {
+      chess.move({from: orig, to: dest, promotion: promotedTo[0]});
+    }
     setTimeout(() => {
       const moves = chess.moves({verbose:true});
       const move = firstMove ? moves[0] : moves[Math.floor(Math.random() * moves.length)];
